@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"name": "Section-13-Feature-Engineering",
+			"path": "C:/MLOPS/mlops-with-aws-datascientists/Section-13-Feature-Engineering"
+		},
+		{
+			"name": "Section-14-Train-tune-deploy",
+			"path": "C:/MLOPS/mlops-with-aws-datascientists/Section-14-Train-tune-deploy"
+		},
+		{
+			"name": "Section-15-Custom-models",
+			"path": "C:/MLOPS/mlops-with-aws-datascientists/Section-15-Custom-models"
+		},
+		{
+			"name": "Section-16-mlops-pipeline",
+			"path": "C:/MLOPS/mlops-with-aws-datascientists/Section-16-mlops-pipeline"
+		}
+	],
+	"settings": {}
+}
