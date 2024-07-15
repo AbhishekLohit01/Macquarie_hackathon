@@ -16,7 +16,7 @@ import sqlite3
 from scipy import spatial
 import PySimpleGUI as sg
 import logging as logger
-# Create a Document instance
+
 
 
 class initiation:
