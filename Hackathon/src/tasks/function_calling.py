@@ -1,10 +1,10 @@
 import sqlite3
-from initiation import Initiation
+from tasks.initiation import Initiation
 
 class FunctionCalling(Initiation):
     def __init__(self):
         super().__init__()
-        self.conn = sqlite3.connect("../../input_database/alerting_db")
+        self.conn = sqlite3.connect("../input_database/alerting_db")
         print("Opened database successfully")
 
     def get_table_names(self, conn):

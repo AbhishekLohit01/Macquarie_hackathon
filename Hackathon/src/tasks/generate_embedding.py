@@ -1,4 +1,3 @@
-import os
 from spire.doc import Document
 from dotenv import dotenv_values
 import openai
@@ -8,10 +7,13 @@ from scipy import spatial
 import tiktoken
 import ast
 import logging as logger
+import os
+
+
 
 class GenerateEmbeddings:
     def __init__(self):
-        # Load API key from environment file
+                # Load API key from environment file
         self.api_key = dotenv_values(os.path.join(os.path.dirname(__file__), "..", "config", "api_data.env"))
         openai.api_key = self.api_key['OPEN_AI_KEY']
         self.client = openai
@@ -19,11 +21,9 @@ class GenerateEmbeddings:
         # Set embedding and GPT models
         self.EMBEDDING_MODEL = "text-embedding-3-small"
         self.GPT_MODEL = "gpt-3.5-turbo"
-        
         # Configure logging
         self.logger = logger
-        self.logger.basicConfig(level=logger.DEBUG, filename=os.path.join(os.path.dirname(__file__), "..", "log_file", "logs_data.log"), filemode='w+')
-
+        self.logger.basicConfig(level=logger.DEBUG, filename=os.path.join(os.path.dirname(__file__), "..", "log_file", "logs_data.log"), filemode='w+')        
         # Load and preprocess embedding data if exists
         self.df = None
         embedding_file_path = os.path.join(os.path.dirname(__file__), "..","..", "input_data", "embedding_output", "embedded_Macquarie_Group_announces_$A3.csv")
@@ -144,13 +144,13 @@ class GenerateEmbeddings:
             {"role": "system", "content": "You answer questions about the macquarie annual report news."},
             {"role": "user", "content": message},
         ]
-        response = self.client.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model=self.GPT_MODEL,
             messages=messages,
             temperature=0,
             max_tokens=50
         )
-        response_message = response['choices'][0]['message']['content']
+        response_message = response.choices[0].message.content
         return response_message
 
 if __name__ == '__main__':

@@ -1,9 +1,9 @@
 import json
 import PySimpleGUI as sg
-from function_calling import FunctionCalling
-from generate_embeddings import GenerateEmbeddings
+from tasks.function_calling import FunctionCalling
+from tasks.generate_embedding import GenerateEmbeddings
 
-os.environ['TK_SILENCE_DEPRECATION'] = '1'
+#os.environ['TK_SILENCE_DEPRECATION'] = '1'
 
 
 class Chat(FunctionCalling, GenerateEmbeddings):
@@ -81,19 +81,18 @@ class Chat(FunctionCalling, GenerateEmbeddings):
         If you need to fetch a piece of information from a system or document that you don't have access to, give a clear, confident answer with some dummy values."""
    
     def execute_function(self, function_calls, messages):
+
         """Wrapper function to execute the tool calls"""
         self.logger.info("inside execute_function")
         for function_call in function_calls.tool_calls:
             function_id = function_call.id
             function_name = function_call.function.name
             function_arguments = json.loads(function_call.function.arguments)
-        
             if function_name == 'get_information':
                 respond = True
-                self.logger.info("inside get_information")
+                self.logger.info("inside get_information 2")
                 instruction_name = function_arguments['information']
-                
-                response_message_embedding = GenerateEmbeddings.ask(instruction_name)
+                response_message_embedding = self.ask(instruction_name)
                 messages.append({
                     "role":"assistant", 
                     "content": response_message_embedding
@@ -104,13 +103,14 @@ class Chat(FunctionCalling, GenerateEmbeddings):
             elif function_name == 'ask_database':
                 respond = True
                 instruction_name = function_arguments['query']
-                # response_message = FunctionCalling.ask_database(instruction_name)
+                #response_message = self.ask_database(instruction_name)
                 messages.append({
                     "role":"assistant", 
                     "content": instruction_name
                 })
+                print(f"Assistant: {instruction_name}")
                 
-                print(f"Assistant: {response_message}")
+                #print(f"Assistant: {response_message}")
                 print("\n\n")       
             elif function_name == 'Answer_generic_questions':
                 respond = True
@@ -149,6 +149,7 @@ class Chat(FunctionCalling, GenerateEmbeddings):
                 if event in (sg.WIN_CLOSED, 'EXIT'):            
                     break
                 if event == 'SEND':
+                    print("Inside Send")
                     user_question = values['-QUERY-'].rstrip()
                     user_message = {"role":"user","content": user_question}
                     messages.append(user_message)
@@ -161,7 +162,6 @@ class Chat(FunctionCalling, GenerateEmbeddings):
                         tools=self.tools,
                         tool_choice='required'
                     )
-                    
                     respond, messages = self.execute_function(response.choices[0].message, messages)
                     print("\n\n")
                     
