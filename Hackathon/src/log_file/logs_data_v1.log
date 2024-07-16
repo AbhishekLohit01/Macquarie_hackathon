@@ -1,0 +1,2 @@
+DEBUG:httpcore.connection:close.started
+DEBUG:httpcore.connection:close.complete
