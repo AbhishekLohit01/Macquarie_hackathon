@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy import spatial
 import tiktoken
+import faiss
 import ast
 import logging as logger
 import os
@@ -71,10 +72,44 @@ class GenerateEmbeddings:
             batch_embeddings = [e.embedding for e in response.data]
             embeddings.extend(batch_embeddings)
             embeddings_dict[para_chunks[batch]] = batch_embeddings
-
+        
+        # Save embeddings to CSV
         embedded_data = pd.DataFrame(list(embeddings_dict.items()), columns=['text', 'embedding'])
         embedded_data.to_csv(os.path.join(os.path.dirname(__file__), "..","..", "input_data", "embedding_output", "embedding_Macquarie_Group_announces_$A3_2.csv"), index=False)
         self.df = embedded_data
+
+        # Save embeddings to vector database
+        self.save_to_vector_db(embeddings)
+        
+        # Load the saved embeddings from vector database
+        self.load_vectors_from_faiss_db()
+
+    
+    def save_to_vector_db(self,embeddings):
+        try:
+            embeddings_array = np.array(embeddings).astype('float32')
+
+            d = embeddings_array.shape[1]
+            index = faiss.IndexFlatL2(d)
+            index.add(embeddings_array)
+            faiss.write_index(index,os.path.join(os.path.dirname(__file__), "..", "..", "input_data", "embedding_output", "faiss_vector_db.index"))
+            print("Embeddings succesfully saved to FAISS vector database")
+
+        except Exception as e:
+            print(f"An error occurred while saving to vector database: {e}")
+
+    def load_vectors_from_faiss_db(self):
+        """Load vectors from a FAISS vector database."""
+        db_path = os.path.join(os.path.dirname(__file__), "..", "..", "input_data", "embedding_output", "faiss_vector_db.index")
+        if os.path.exists(db_path):
+            index = faiss.read_index(db_path)
+            vectors = index.reconstruct_n(0, index.ntotal)
+            print(f"Loaded {index.ntotal} vectors from {db_path}")
+            return vectors
+        else:
+            print(f"Database file {db_path} does not exist.")
+            return None
+
 
     def pipeline_flow(self, file_path):
         """Pipeline flow for extracting and embedding paragraphs from a document."""
